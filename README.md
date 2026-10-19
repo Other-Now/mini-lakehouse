@@ -123,6 +123,22 @@ Then vacuum runs and the table is checked again.
 | **no** conflict detection | sum off by ~+200,000 and 200 duplicate keys: updates raced compaction and resurrected dropped file groups ([report](results/local/crash-control-NONE.md)) |
 | **file-group-only** conflict detection | 187 → 412 duplicate keys from concurrent inserts of the same new key; compaction then throws on every attempt ([report](results/local/crash-control-FILE_GROUP.md)). The full check on the same workload: 0 failures ([report](results/local/crash-LINK-FULL-shared-inserts.md)) |
 
+### Linux CI ([results/ci/](results/ci/), GitHub Actions run 39211481978, 4 vCPU)
+
+The same suite on a Linux runner. File creation is far cheaper on Linux than on NTFS, so throughput is 3–6×
+higher. The shape of every result is the same.
+
+| | Linux CI |
+|---|---|
+| OCC, 64 hot groups, 1 / 4 / 16 writers | 228 / 595 / 303 commits/s; abort 0 / 15.2 / 46.7%; **0 lost updates** in all 20 cells |
+| OCC, 1 hot group, 16 writers | 89.1% abort; p99 needs 53 attempts |
+| Lookup, 1 key (random keys) | hash 0.14 µs · bloom 0.6 ms (cached) / 10.5 ms (100 footers) · scan 64 ms |
+| Lookup, 10,000 random keys | hash 0.09 ms · bloom 84 ms · scan **68 ms** (bloom still loses at large batches) |
+| Compaction 500 → 5 files | scan 4.2×, bloom lookup 8.6× |
+| Crash test | 40 rounds, **19,493 versions**, 75 injected crashes + 28 kill -9, 0 failing rounds, **0 of 19,447** acked commits lost |
+| Controls | RENAME: 80 acked commits lost · DIRECT: unreadable after a torn commit · NONE: 987 → 1,290 duplicate keys · FILE_GROUP: 604 duplicate keys · FULL on the same workload: 0 failures |
+| S3 (MinIO built from source) | conditional-PUT race exclusive (0 double winners); transfers on S3: 254 commits, 135 aborts, 62 concurrent snapshot scans, 0 inconsistent, 0 drift |
+
 ## Things found along the way
 
 1. **Rename is not put-if-absent.** On Windows, `Files.move(…, ATOMIC_MOVE)` replaced an existing commit file
@@ -147,8 +163,9 @@ scripts/run-all.sh local # all benchmarks, the crash test and the controls -> re
 
 ## What is not here
 
-* **S3 is tested only in CI.** `S3Storage` uses conditional `PUT` and is exercised against MinIO built from
-  source in GitHub Actions (no AWS account or Docker on the dev machine). All benchmark numbers are local disk.
+* **S3 is tested only in CI.** `S3Storage` uses conditional `PUT` and is exercised against MinIO (built from
+  source; Docker Hub no longer serves minio/minio) in GitHub Actions. There is no AWS account or Docker on the dev
+  machine. It has never run against real AWS S3. All benchmark numbers are local disk.
 * Copy-on-write only: no merge-on-read log files, no deletes, no partitioning, no schema evolution, no metadata
   table. The record-level index lives entirely in memory (Hudi's is HFile-backed and partitioned).
 * Writers in the contention benchmark are threads with independent handles. The crash test uses separate
