@@ -1,0 +1,25 @@
+layout,method,batch,median_ms,us_per_key,footers_read,files_key_scanned,keys_scanned,candidates,false_positives
+ORDERED,hash index,1,0.0017,1.700,0,0,0,0,0
+ORDERED,bloom (footers cached),1,3.6502,3650.200,0,1,10000,1,0
+ORDERED,bloom (footers read per lookup),1,12.0018,12001.800,1,1,10000,1,0
+ORDERED,full scan,1,156.0546,156054.600,0,100,1000000,0,0
+ORDERED,hash index,100,0.0051,0.051,0,0,0,0,0
+ORDERED,bloom (footers cached),100,66.7964,667.964,0,39,390000,52,2
+ORDERED,bloom (footers read per lookup),100,79.4519,794.519,63,39,390000,52,2
+ORDERED,full scan,100,123.0976,1230.976,0,100,1000000,0,0
+ORDERED,hash index,10000,2.5501,0.255,0,0,0,0,0
+ORDERED,bloom (footers cached),10000,121.3665,12.137,0,100,1000000,5042,42
+ORDERED,bloom (footers read per lookup),10000,130.2952,13.030,100,100,1000000,5042,42
+ORDERED,full scan,10000,108.5532,10.855,0,100,1000000,0,0
+RANDOM,hash index,1,0.0001,0.100,0,0,0,0,0
+RANDOM,bloom (footers cached),1,0.8750,875.000,0,1,10000,1,0
+RANDOM,bloom (footers read per lookup),1,24.4301,24430.100,100,1,10000,1,0
+RANDOM,full scan,1,97.8781,97878.100,0,100,1000000,0,0
+RANDOM,hash index,100,0.0032,0.032,0,0,0,0,0
+RANDOM,bloom (footers cached),100,64.8739,648.739,0,82,820000,174,124
+RANDOM,bloom (footers read per lookup),100,124.5677,1245.677,100,82,820000,174,124
+RANDOM,full scan,100,130.9403,1309.403,0,100,1000000,0,0
+RANDOM,hash index,10000,0.2766,0.028,0,0,0,0,0
+RANDOM,bloom (footers cached),10000,116.3801,11.638,0,100,1000000,14978,9978
+RANDOM,bloom (footers read per lookup),10000,128.3954,12.840,100,100,1000000,14978,9978
+RANDOM,full scan,10000,76.8138,7.681,0,100,1000000,0,0
